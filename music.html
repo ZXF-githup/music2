@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link type="text/css" rel="stylesheet" href="music.css">
+</head>
+
+<body>
+    <!-- 
+        1、歌曲搜索
+            按下回车（v-on .enter)
+            查询数据（axios 接口 v-model）
+            渲染数据（v-for 数组 that）
+
+            歌曲搜索接口：https://autumnfish.cn/search
+            请求方法get
+            请求参数keywords（查询的关键字）
+            响应内容：歌曲搜索结果
+
+        2、歌曲播放
+            点击播放（v-on 自定义参数）
+            歌曲地址获取（接口 歌曲id）
+            歌曲地址设置
+
+            请求地址：https://autumnfish.cn/song/url
+            请求方法get
+            请求参数id（歌曲id）
+            响应内容：歌曲的URL地址
+
+        3、歌曲封面
+            点击播放（增加逻辑）
+            歌曲封面获取（接口 歌曲id）
+            歌曲封面设置（v-bind）
+
+            请求地址：https://autumnfish.cn/song/detail
+            请求方法get
+            请求参数ids（歌曲id）
+            响应内容：歌曲详情，包含封面信息
+
+        4、歌曲评论
+            点击播放
+            歌曲评论获取
+            歌曲评论渲染
+
+            请求地址：https://autumnfish.cn/comment/hot?type=0
+            请求方法：get
+            请求参数id（歌曲id,type固定为0）
+            响应内容：歌曲的热门评论
+
+        5、播放动画
+            监听音乐播放（v-on play）
+            监听音乐暂停（v-on pause）
+            操纵类名（v-bind 对象）
+
+        6、MV播放
+            mv图标显示（v-if）
+            MV地址获取（接口 mvid）
+            遮罩层（v-show v-on）
+            MV地址设置（v-bind）
+
+            请求地址：https://autumnfish.cn/mv/url
+            请求方法get
+            请求参数id（mvid，为0说明没有MV）
+            响应内容：MV的地址
+     -->
+
+    <div class="wrap">
+        <!-- 播放主体区域 -->
+        <div class="play_wrap" id="player">
+            <div class="search_bar">
+                <p style="margin-left:15px">往抑云</p>
+                <!-- 搜索歌曲 -->
+                <input type="text" autocomplete="off" v-model="query" @keyup.enter="searchMusic" placeholder="输入你想听的歌曲">
+            </div>
+            <div class="center_con">
+                <!-- 搜索歌曲列表 -->
+                <div class="song_wrapper">
+                    <ul class="song_list">
+                        <li v-for="item in musicList">
+                            <a href="javascript:;" @click="playMusic(item.id)"></a>
+                            <b>{{item.name}}</b>
+                            <span v-if="item.mvid!=0" @click="playMV(item.mvid)"><i class="iconfont"></i></span>
+                        </li>
+                    </ul> 
+                    <img src="https://i.loli.net/2020/03/23/dor23bhZtIvK17X.png" alt="" class="switch_btn">
+                </div>
+                <!-- 歌曲信息容器 -->
+                <div class="player_con" :class="{playing:isPlaying}">
+                    <img src="https://i.loli.net/2020/03/23/gZHko2WlpJNcGPv.png" class="play_bar">
+                    <!-- 黑胶碟片 -->
+                    <img src="https://i.loli.net/2020/03/23/hQPuH4gNRx7XayI.png" class="disc autoRotate">
+                    <img src="https://p1.music.126.net/HvB44MNINoLar8HFbRjIGQ==/109951165142435842.jpg"
+                        class="cover autoRotate">
+                </div>
+                <!-- 评论容器 -->
+                <div class="comment_wrapper">
+                    <h5 class="title">热门留言</h5>
+                    <div class="comment_list">
+                        <dl v-for="item in hotComments">
+                            <dt><img :src="item.user.avatarUrl"></dt>
+                            <dd class="name">{{item.nickname}}</dd>
+                            <dd class="detail">{{item.content}}</dd>
+                        </dl>
+                    </div>
+                    <img src="https://i.loli.net/2020/03/23/dor23bhZtIvK17X.png" class="right_line">
+                </div>
+            </div>
+            <div class="audio_con">
+                <audio @play="play" @pause="pause" :src="musicUrl" controls autoplay loop
+                    class="myaudio"></audio>
+            </div>
+            <div class="video_con" v-show="isShow" style="display: none;">
+                <video :src="mvUrl" controls="controls"></video>
+                <div class="mask" @click="hide"></div>
+                </video>
+            </div>
+        </div>
+
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script type="text/javascript" src="main.js"></script>
+</body>
+
+</html>
